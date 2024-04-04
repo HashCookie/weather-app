@@ -128,7 +128,7 @@ export default function Home() {
                         {format(parseISO(d.dt_txt), "h:mm a")}
                       </p>
                       <WeatherIcon
-                        iconName={getDayOrNightIcon(
+                        iconname={getDayOrNightIcon(
                           firstData?.weather[0].icon ?? "",
                           firstData?.dt_txt ?? ""
                         )}
