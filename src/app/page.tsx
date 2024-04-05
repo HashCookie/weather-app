@@ -98,12 +98,13 @@ export default function Home() {
   const uniqueDates = [
     ...new Set(
       data?.list.map(
-        (entry) => new Date(entry.dt * 1000).toISOString().split("T")[0]
+        (entry: { dt: number }) =>
+          new Date(entry.dt * 1000).toISOString().split("T")[0]
       )
     ),
   ];
 
-  const reasonableTemperatureRange = (temp) => {
+  const reasonableTemperatureRange = (temp: number) => {
     // 定义一个温度的合理范围，例如在绝对零度和最高温度之间
     return temp > ABSOLUTE_ZERO_KELVIN && temp < HIGHEST_REASONABLE_TEMP_KELVIN;
   };
@@ -111,15 +112,19 @@ export default function Home() {
   // 筛选数据以获取每个唯一日期的6点后的第一个条目。
   const firstDataForEachDate = uniqueDates
     .map((date) => {
-      return data?.list.find((entry) => {
-        const entryDate = new Date(entry.dt * 1000).toISOString().split("T")[0];
-        const entryTime = new Date(entry.dt * 1000).getHours();
-        return (
-          entryDate === date &&
-          entryTime >= 6 &&
-          reasonableTemperatureRange(entry.main.temp)
-        );
-      });
+      return data?.list.find(
+        (entry: { dt: number; main: { temp: number } }) => {
+          const entryDate = new Date(entry.dt * 1000)
+            .toISOString()
+            .split("T")[0];
+          const entryTime = new Date(entry.dt * 1000).getHours();
+          return (
+            entryDate === date &&
+            entryTime >= 6 &&
+            reasonableTemperatureRange(entry.main.temp)
+          );
+        }
+      );
     })
     .filter(Boolean);
 
@@ -127,6 +132,13 @@ export default function Home() {
     return (
       <div className="flex items-center min-h-screen justify-center">
         <p className="animate-bounce">Loading...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center min-h-screen justify-center">
+        {/* @ts-ignore */}
+        <p className="text-red-400">{error.message}</p>
       </div>
     );
 
