@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 import { useQuery } from "react-query";
 import { format, fromUnixTime, parseISO } from "date-fns";
+import { zhCN } from "date-fns/locale";
 import Container from "@/components/Container";
 import axios from "axios";
 import { convertKelvinToCelsius } from "@/utils/convertKelvinToCelsius";
@@ -126,7 +127,11 @@ export default function Home() {
             <section className="space-y-4 ">
               <div className="space-y-2">
                 <h2 className="flex gap-1 text-2xl  items-end ">
-                  <p>{format(parseISO(firstData?.dt_txt ?? ""), "EEEE")}</p>
+                  <p>
+                    {format(parseISO(firstData?.dt_txt ?? ""), "EEEE", {
+                      locale: zhCN,
+                    })}
+                  </p>
                   <p className="text-lg">
                     ({format(parseISO(firstData?.dt_txt ?? ""), "yyyy.MM.dd")})
                   </p>
@@ -211,6 +216,7 @@ export default function Home() {
                 </Container>
               </div>
             </section>
+
             {/* 7 day forcast data  */}
             <section className="flex w-full flex-col gap-4  ">
               <p className="text-2xl">预报（7天）</p>
@@ -220,7 +226,11 @@ export default function Home() {
                   description={d?.weather[0].description ?? ""}
                   weatehrIcon={d?.weather[0].icon ?? "01d"}
                   date={d ? format(parseISO(d.dt_txt), "MM.dd") : ""}
-                  day={d ? format(parseISO(d.dt_txt), "EEEE") : ""}
+                  day={
+                    d
+                      ? format(parseISO(d.dt_txt), "EEEE", { locale: zhCN })
+                      : ""
+                  }
                   feels_like={d?.main.feels_like ?? 0}
                   temp={d?.main.temp ?? 0}
                   temp_max={d?.main.temp_max ?? 0}
