@@ -17,6 +17,9 @@ import { loadingCityAtom, placeAtom } from "./atom";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 
+const ABSOLUTE_ZERO_KELVIN = 0;
+const HIGHEST_REASONABLE_TEMP_KELVIN = 330;
+
 interface WeatherDetail {
   dt: number;
   main: {
@@ -100,14 +103,25 @@ export default function Home() {
     ),
   ];
 
+  const reasonableTemperatureRange = (temp) => {
+    // 定义一个温度的合理范围，例如在绝对零度和最高温度之间
+    return temp > ABSOLUTE_ZERO_KELVIN && temp < HIGHEST_REASONABLE_TEMP_KELVIN;
+  };
+
   // 筛选数据以获取每个唯一日期的6点后的第一个条目。
-  const firstDataForEachDate = uniqueDates.map((date) => {
-    return data?.list.find((entry) => {
-      const entryDate = new Date(entry.dt * 1000).toISOString().split("T")[0];
-      const entryTime = new Date(entry.dt * 1000).getHours();
-      return entryDate === date && entryTime >= 6;
-    });
-  });
+  const firstDataForEachDate = uniqueDates
+    .map((date) => {
+      return data?.list.find((entry) => {
+        const entryDate = new Date(entry.dt * 1000).toISOString().split("T")[0];
+        const entryTime = new Date(entry.dt * 1000).getHours();
+        return (
+          entryDate === date &&
+          entryTime >= 6 &&
+          reasonableTemperatureRange(entry.main.temp)
+        );
+      });
+    })
+    .filter(Boolean);
 
   if (isLoading)
     return (
